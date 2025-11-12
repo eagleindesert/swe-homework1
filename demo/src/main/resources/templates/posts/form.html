@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${isEdit != null ? '게시글 수정' : '게시글 작성'}">게시글 작성</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #4CAF50;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="text"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+        
+        textarea {
+            min-height: 300px;
+            resize: vertical;
+        }
+        
+        .error {
+            color: #dc3545;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+        
+        .error-field {
+            border-color: #dc3545 !important;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: #4CAF50;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #45a049;
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        
+        .required {
+            color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 th:text="${isEdit != null ? '✏️ 게시글 수정' : '✏️ 게시글 작성'}">게시글 작성</h1>
+        
+        <form th:action="${isEdit != null ? '/posts/' + postDto.id : '/posts'}" 
+              method="post" 
+              th:object="${postDto}">
+            
+            <div class="form-group">
+                <label for="title">제목 <span class="required">*</span></label>
+                <input type="text" 
+                       id="title" 
+                       th:field="*{title}" 
+                       th:classappend="${#fields.hasErrors('title')} ? 'error-field'"
+                       placeholder="제목을 입력하세요">
+                <div class="error" th:if="${#fields.hasErrors('title')}" th:errors="*{title}">제목 오류</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="author">작성자 <span class="required">*</span></label>
+                <input type="text" 
+                       id="author" 
+                       th:field="*{author}" 
+                       th:classappend="${#fields.hasErrors('author')} ? 'error-field'"
+                       placeholder="작성자를 입력하세요"
+                       th:readonly="${isEdit != null}">
+                <div class="error" th:if="${#fields.hasErrors('author')}" th:errors="*{author}">작성자 오류</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="content">내용 <span class="required">*</span></label>
+                <textarea id="content" 
+                          th:field="*{content}" 
+                          th:classappend="${#fields.hasErrors('content')} ? 'error-field'"
+                          placeholder="내용을 입력하세요"></textarea>
+                <div class="error" th:if="${#fields.hasErrors('content')}" th:errors="*{content}">내용 오류</div>
+            </div>
+            
+            <div class="button-group">
+                <button type="submit" class="btn btn-primary" 
+                        th:text="${isEdit != null ? '수정하기' : '작성하기'}">작성하기</button>
+                <a th:href="${isEdit != null ? '/posts/' + postDto.id : '/posts'}" 
+                   class="btn btn-secondary">취소</a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
