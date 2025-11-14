@@ -208,6 +208,7 @@ public interface ScheduleService {
     ScheduleResponseDto updateSchedule(Long id, ScheduleRequestDto requestDto);
     void deleteSchedule(Long id);
     boolean hasOverlappingSchedule(LocalDate date, LocalTime startTime, LocalTime endTime);
+    List<ScheduleResponseDto> getDailyDetailSchedules(LocalDate date);
 }
 ```
 
@@ -306,6 +307,27 @@ public class ScheduleController {
     ) {
         return scheduleService.getSchedulesByMonth(year, month);
     }
+    
+    // 일별 상세 보기 페이지
+    @GetMapping("/daily/{date}")
+    public String showDailyDetail(
+        @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+        Model model
+    ) {
+        List<ScheduleResponseDto> schedules = scheduleService.getDailyDetailSchedules(date);
+        model.addAttribute("selectedDate", date);
+        model.addAttribute("schedules", schedules);
+        return "calendar/daily-detail";
+    }
+    
+    // REST API - 일별 상세 일정 조회 (AJAX)
+    @GetMapping("/api/daily/{date}")
+    @ResponseBody
+    public List<ScheduleResponseDto> getDailySchedules(
+        @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
+    ) {
+        return scheduleService.getDailyDetailSchedules(date);
+    }
 }
 ```
 
@@ -335,7 +357,39 @@ public class ScheduleController {
 * 마우스 오버 시: 팀 이름, 시작-종료 시간 표시
 ```
 
-#### 4.1.2 일정 등록/수정 폼
+#### 4.1.2 일별 상세 보기 화면
+```
+┌─────────────────────────────────────────────────────────┐
+│  2025년 11월 5일 일정                        [닫기]    │
+├──────────┬──────────────────────────────────────────────┤
+│ 00:00    │                                              │
+├──────────┤                                              │
+│ 01:00    │                                              │
+├──────────┤                                              │
+│  ...     │                                              │
+├──────────┤                                              │
+│ 14:00    │ ████████████████████                        │
+│          │ [밴드1] 14:00-16:00          [수정] [삭제]  │
+├──────────┤                                              │
+│ 15:00    │ ████████████████████                        │
+├──────────┤                                              │
+│ 16:00    │                                              │
+├──────────┤                                              │
+│ 17:00    │ ██████████████                              │
+│          │ [밴드2] 17:00-18:30          [수정] [삭제]  │
+├──────────┤                                              │
+│ 18:00    │ ██████████████                              │
+├──────────┤                                              │
+│  ...     │                                              │
+├──────────┤                                              │
+│ 23:00    │                                              │
+└──────────┴──────────────────────────────────────────────┘
+
+* 시간대별로 일정을 시각적으로 표시
+* 각 일정은 클릭하여 수정/삭제 가능
+```
+
+#### 4.1.3 일정 등록/수정 폼
 ```
 ┌─────────────────────────────────────────┐
 │  일정 등록                              │
@@ -358,6 +412,11 @@ public class ScheduleController {
     │
     ├─→ [일정 추가] → 일정 등록 폼 → [저장] → 메인 달력 화면
     │
+    ├─→ [날짜 클릭] → 일별 상세 보기 화면 → [닫기] → 메인 달력 화면
+    │                     │
+    │                     ├─→ [일정 수정] → 일정 수정 폼 → [저장] → 일별 상세 보기 화면
+    │                     └─→ [일정 삭제] → 일별 상세 보기 화면 (갱신)
+    │
     ├─→ [일정 클릭] → 일정 상세/수정 폼 → [수정] → 메인 달력 화면
     │                                  └→ [삭제] → 메인 달력 화면
     │
@@ -377,6 +436,8 @@ public class ScheduleController {
 | POST | /schedules/{id} | 일정 수정 | ScheduleRequestDto | Redirect |
 | POST | /schedules/{id}/delete | 일정 삭제 | - | Redirect |
 | GET | /schedules/api/monthly | 월별 일정 조회 (AJAX) | year, month | JSON |
+| GET | /schedules/daily/{date} | 일별 상세 보기 페이지 | - | HTML |
+| GET | /schedules/api/daily/{date} | 일별 상세 일정 조회 (AJAX) | - | JSON |
 
 ### 5.2 API 상세
 
@@ -411,6 +472,25 @@ Response:
 ]
 ```
 
+#### 일별 상세 일정 조회 API (AJAX)
+```
+GET /schedules/api/daily/2025-11-15
+
+Response:
+[
+  {
+    "id": 1,
+    "teamName": "밴드1",
+    "scheduleDate": "2025-11-15",
+    "startTime": "14:00:00",
+    "endTime": "16:00:00",
+    "createdAt": "2025-11-14T10:00:00",
+    "updatedAt": "2025-11-14T10:00:00"
+  },
+  ...
+]
+```
+
 ## 6. 프론트엔드 설계
 
 ### 6.1 템플릿 구조
@@ -419,7 +499,8 @@ templates/
 ├── layout/
 │   └── default.html          # 공통 레이아웃
 ├── calendar/
-│   └── index.html            # 메인 달력 화면
+│   ├── index.html            # 메인 달력 화면
+│   └── daily-detail.html     # 일별 상세 보기 화면
 ├── schedule/
 │   ├── form.html             # 일정 등록/수정 폼
 │   └── detail.html           # 일정 상세 (툴팁용)
@@ -430,6 +511,10 @@ templates/
 
 ### 6.2 JavaScript 컴포넌트
 - **CalendarRenderer**: 달력 렌더링
+- **ScheduleManager**: 일정 CRUD 처리
+- **TooltipManager**: 일정 상세 정보 툴팁 표시
+- **DateNavigator**: 월 이동 기능
+- **DailyDetailViewer**: 일별 상세 보기 모달/패널 관리
 - **ScheduleManager**: 일정 CRUD 처리
 - **TooltipManager**: 일정 상세 정보 툴팁 표시
 - **DateNavigator**: 월 이동 기능
@@ -509,3 +594,4 @@ java -jar build/libs/demo-0.0.1-SNAPSHOT.jar
 | 버전 | 날짜 | 작성자 | 변경 내용 |
 |------|------|--------|-----------|
 | 1.0 | 2025-11-14 | - | 초안 작성 |
+| 1.1 | 2025-11-14 | - | 일별 상세 보기 화면 및 API 추가 |
