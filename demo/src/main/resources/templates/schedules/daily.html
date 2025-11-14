@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>일별 상세 일정</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1 th:text="${#temporals.format(selectedDate, 'yyyy년 MM월 dd일')} + ' 일정'">일별 상세 일정</h1>
+            <a th:href="@{/schedules}" class="btn btn-secondary">달력으로 돌아가기</a>
+        </header>
+
+        <!-- 성공/오류 메시지 -->
+        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+        <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+        <div class="daily-view">
+            <!-- 시간대별 일정 표시 -->
+            <div class="timeline">
+                <div th:each="hour : ${#numbers.sequence(0, 23)}" class="timeline-row">
+                    <div class="timeline-hour" th:text="${#strings.toString(hour).length() == 1 ? '0' + hour : hour} + ':00'"></div>
+                    <div class="timeline-content">
+                        <!-- 해당 시간대의 일정 표시 -->
+                        <div th:each="schedule : ${schedules}" 
+                             th:if="${#temporals.hour(schedule.startTime) == hour || 
+                                    (#temporals.hour(schedule.startTime) < hour && #temporals.hour(schedule.endTime) > hour)}"
+                             class="schedule-block"
+                             th:style="'height: ' + 
+                                     ${(#temporals.hour(schedule.endTime) * 60 + #temporals.minute(schedule.endTime)) - 
+                                      (#temporals.hour(schedule.startTime) * 60 + #temporals.minute(schedule.startTime))} + 'px;'">
+                            
+                            <div class="schedule-info">
+                                <strong th:text="${schedule.teamName}">팀 이름</strong>
+                                <span th:text="${#temporals.format(schedule.startTime, 'HH:mm')} + ' - ' + 
+                                              ${#temporals.format(schedule.endTime, 'HH:mm')}">시간</span>
+                            </div>
+                            
+                            <div class="schedule-actions">
+                                <a th:href="@{/schedules/{id}/edit(id=${schedule.id})}" 
+                                   class="btn btn-sm btn-primary">수정</a>
+                                <form th:action="@{/schedules/{id}/delete(id=${schedule.id})}" 
+                                      method="post" 
+                                      style="display: inline;"
+                                      onsubmit="return confirm('정말 삭제하시겠습니까?');">
+                                    <button type="submit" class="btn btn-sm btn-danger">삭제</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 일정이 없는 경우 -->
+            <div th:if="${#lists.isEmpty(schedules)}" class="no-schedules">
+                <p>이 날짜에 등록된 일정이 없습니다.</p>
+                <a th:href="@{/schedules/new}" class="btn btn-primary">일정 추가</a>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/js/daily.js}"></script>
+</body>
+</html>

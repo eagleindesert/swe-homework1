@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${isEdit ? '일정 수정' : '일정 등록'}">일정 등록</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1 th:text="${isEdit ? '일정 수정' : '일정 등록'}">일정 등록</h1>
+        </header>
+
+        <div class="form-container">
+            <form th:action="${isEdit ? '/schedules/' + scheduleId : '/schedules'}" 
+                  th:object="${schedule}" 
+                  method="post">
+                
+                <!-- 팀 이름 -->
+                <div class="form-group">
+                    <label for="teamName">팀 이름 <span class="required">*</span></label>
+                    <input type="text" 
+                           id="teamName" 
+                           th:field="*{teamName}" 
+                           class="form-control"
+                           placeholder="예: 밴드1"
+                           required>
+                    <div class="error" th:if="${#fields.hasErrors('teamName')}" 
+                         th:errors="*{teamName}"></div>
+                </div>
+
+                <!-- 날짜 -->
+                <div class="form-group">
+                    <label for="scheduleDate">날짜 <span class="required">*</span></label>
+                    <input type="date" 
+                           id="scheduleDate" 
+                           th:field="*{scheduleDate}" 
+                           class="form-control"
+                           required>
+                    <div class="error" th:if="${#fields.hasErrors('scheduleDate')}" 
+                         th:errors="*{scheduleDate}"></div>
+                </div>
+
+                <!-- 시작 시간 -->
+                <div class="form-group">
+                    <label for="startTime">시작 시간 <span class="required">*</span></label>
+                    <input type="time" 
+                           id="startTime" 
+                           th:field="*{startTime}" 
+                           class="form-control"
+                           required>
+                    <div class="error" th:if="${#fields.hasErrors('startTime')}" 
+                         th:errors="*{startTime}"></div>
+                </div>
+
+                <!-- 종료 시간 -->
+                <div class="form-group">
+                    <label for="endTime">종료 시간 <span class="required">*</span></label>
+                    <input type="time" 
+                           id="endTime" 
+                           th:field="*{endTime}" 
+                           class="form-control"
+                           required>
+                    <div class="error" th:if="${#fields.hasErrors('endTime')}" 
+                         th:errors="*{endTime}"></div>
+                </div>
+
+                <!-- 버튼 -->
+                <div class="form-actions">
+                    <a th:href="@{/schedules}" class="btn btn-secondary">취소</a>
+                    <button type="submit" class="btn btn-primary" 
+                            th:text="${isEdit ? '수정' : '저장'}">저장</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

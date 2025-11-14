@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>합주 일정 캘린더</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎸 합주 일정 캘린더</h1>
+            <a th:href="@{/schedules/new}" class="btn btn-primary">일정 추가</a>
+        </header>
+
+        <!-- 성공/오류 메시지 -->
+        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+        <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+        <!-- 월 네비게이션 -->
+        <div class="calendar-navigation">
+            <a th:href="@{/schedules(year=${year}, month=${month == 1 ? 12 : month - 1}, year=${month == 1 ? year - 1 : year})}" 
+               class="btn btn-nav">◀ 이전</a>
+            <h2 class="current-month" th:text="${year} + '년 ' + ${month} + '월'"></h2>
+            <a th:href="@{/schedules(year=${year}, month=${month == 12 ? 1 : month + 1}, year=${month == 12 ? year + 1 : year})}" 
+               class="btn btn-nav">다음 ▶</a>
+        </div>
+
+        <!-- 달력 -->
+        <div class="calendar">
+            <div class="calendar-header">
+                <div class="day-header">일</div>
+                <div class="day-header">월</div>
+                <div class="day-header">화</div>
+                <div class="day-header">수</div>
+                <div class="day-header">목</div>
+                <div class="day-header">금</div>
+                <div class="day-header">토</div>
+            </div>
+            <div class="calendar-body">
+                <!-- 시작 요일 전 빈 칸 -->
+                <div th:each="i : ${#numbers.sequence(0, startDayOfWeek - 1)}" class="calendar-day empty"></div>
+                
+                <!-- 각 날짜 -->
+                <div th:each="day : ${#numbers.sequence(1, daysInMonth)}" 
+                     class="calendar-day"
+                     th:classappend="${#temporals.day(#temporals.createToday()) == day && 
+                                     #temporals.month(#temporals.createToday()) == month && 
+                                     #temporals.year(#temporals.createToday()) == year} ? 'today' : ''">
+                    
+                    <div class="day-number" th:text="${day}"></div>
+                    
+                    <!-- 해당 날짜의 일정 표시 -->
+                    <div class="schedules-container">
+                        <div th:each="schedule : ${schedules}" 
+                             th:if="${#temporals.day(schedule.scheduleDate) == day}"
+                             class="schedule-item"
+                             th:attr="data-id=${schedule.id}, data-team=${schedule.teamName}, 
+                                     data-start=${schedule.startTime}, data-end=${schedule.endTime}">
+                            <span class="schedule-time" 
+                                  th:text="${#temporals.format(schedule.startTime, 'HH:mm')}"></span>
+                            <span class="schedule-team" th:text="${schedule.teamName}"></span>
+                            <div class="schedule-tooltip">
+                                <strong th:text="${schedule.teamName}"></strong><br>
+                                <span th:text="${#temporals.format(schedule.startTime, 'HH:mm')} + ' - ' + 
+                                              ${#temporals.format(schedule.endTime, 'HH:mm')}"></span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 날짜 클릭 시 상세 보기 -->
+                    <a th:href="@{/schedules/daily/{date}(date=${year + '-' + 
+                               (#strings.toString(month).length() == 1 ? '0' + month : month) + '-' + 
+                               (#strings.toString(day).length() == 1 ? '0' + day : day)})}" 
+                       class="day-detail-link">상세 보기</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/js/calendar.js}"></script>
+</body>
+</html>
