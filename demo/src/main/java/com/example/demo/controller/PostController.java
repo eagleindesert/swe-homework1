@@ -35,12 +35,18 @@ public class PostController {
         List<Post> posts;
         
         if (keyword != null && !keyword.isEmpty()) {
-            if ("title".equals(searchType)) {
-                posts = postService.searchByTitle(keyword);
-            } else if ("author".equals(searchType)) {
-                posts = postService.searchByAuthor(keyword);
-            } else {
+            if (null == searchType) {
                 posts = postService.getAllPosts();
+            } else switch (searchType) {
+                case "title":
+                    posts = postService.searchByTitle(keyword);
+                    break;
+                case "author":
+                    posts = postService.searchByAuthor(keyword);
+                    break;
+                default:
+                    posts = postService.getAllPosts();
+                    break;
             }
             model.addAttribute("searchType", searchType);
             model.addAttribute("keyword", keyword);
