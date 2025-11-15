@@ -39,6 +39,9 @@ public class Schedule {
     @Column(nullable = false, length = 50, name = "team_name")
     private String teamName;
 
+    @Column(length = 500, name = "team_members")
+    private String teamMembers;
+
     @Column(nullable = false, name = "schedule_date")
     private LocalDate scheduleDate;
 

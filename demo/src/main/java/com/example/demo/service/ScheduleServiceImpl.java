@@ -1,20 +1,22 @@
 package com.example.demo.service;
 
-import com.example.demo.dto.ScheduleRequestDto;
-import com.example.demo.dto.ScheduleResponseDto;
-import com.example.demo.entity.Schedule;
-import com.example.demo.exception.ResourceNotFoundException;
-import com.example.demo.repository.ScheduleRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.YearMonth;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.example.demo.dto.ScheduleRequestDto;
+import com.example.demo.dto.ScheduleResponseDto;
+import com.example.demo.entity.Schedule;
+import com.example.demo.exception.ResourceNotFoundException;
+import com.example.demo.repository.ScheduleRepository;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Transactional
@@ -35,6 +37,7 @@ public class ScheduleServiceImpl implements ScheduleService {
 
         Schedule schedule = Schedule.builder()
                 .teamName(requestDto.getTeamName())
+                .teamMembers(requestDto.getTeamMembers())
                 .scheduleDate(requestDto.getScheduleDate())
                 .startTime(requestDto.getStartTime())
                 .endTime(requestDto.getEndTime())
@@ -102,6 +105,7 @@ public class ScheduleServiceImpl implements ScheduleService {
         }
 
         schedule.setTeamName(requestDto.getTeamName());
+        schedule.setTeamMembers(requestDto.getTeamMembers());
         schedule.setScheduleDate(requestDto.getScheduleDate());
         schedule.setStartTime(requestDto.getStartTime());
         schedule.setEndTime(requestDto.getEndTime());

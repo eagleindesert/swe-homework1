@@ -1,14 +1,15 @@
 package com.example.demo.dto;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+
 import com.example.demo.entity.Schedule;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 @Data
 @NoArgsConstructor
@@ -18,6 +19,7 @@ public class ScheduleResponseDto {
 
     private Long id;
     private String teamName;
+    private String teamMembers;
     private LocalDate scheduleDate;
     private LocalTime startTime;
     private LocalTime endTime;
@@ -28,6 +30,7 @@ public class ScheduleResponseDto {
         return ScheduleResponseDto.builder()
                 .id(schedule.getId())
                 .teamName(schedule.getTeamName())
+                .teamMembers(schedule.getTeamMembers())
                 .scheduleDate(schedule.getScheduleDate())
                 .startTime(schedule.getStartTime())
                 .endTime(schedule.getEndTime())

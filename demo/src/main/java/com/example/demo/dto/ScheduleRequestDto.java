@@ -23,6 +23,9 @@ public class ScheduleRequestDto {
     @Size(max = 50, message = "팀 이름은 50자를 초과할 수 없습니다")
     private String teamName;
 
+    @Size(max = 500, message = "팀원 구성은 500자를 초과할 수 없습니다")
+    private String teamMembers;
+
     @NotNull(message = "날짜는 필수입니다")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate scheduleDate;

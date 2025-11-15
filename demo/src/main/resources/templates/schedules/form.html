@@ -6,6 +6,7 @@
     <title th:text="${isEdit ? '일정 수정' : '일정 등록'}">일정 등록</title>
     <link rel="icon" type="image/svg+xml" th:href="@{/favicon.svg}">
     <link rel="stylesheet" th:href="@{/css/style.css}">
+    <script th:src="@{/js/teams.js}" defer></script>
 </head>
 <body>
     <div class="container">
@@ -14,22 +15,43 @@
         </header>
 
         <div class="form-container">
-            <form th:action="${isEdit ? '/schedules/' + scheduleId : '/schedules'}" 
-                  th:object="${schedule}" 
-                  method="post">
-                
-                <!-- 팀 이름 -->
-                <div class="form-group">
-                    <label for="teamName">팀 이름 <span class="required">*</span></label>
-                    <input type="text" 
-                           id="teamName" 
-                           th:field="*{teamName}" 
-                           class="form-control"
-                           placeholder="예: 밴드1"
-                           required>
-                    <div class="error" th:if="${#fields.hasErrors('teamName')}" 
-                         th:errors="*{teamName}"></div>
+            <div class="form-layout">
+                <!-- 왼쪽: 최근 생성 팀 -->
+                <div class="recent-schedules-section">
+                    <h3>최근 생성 팀</h3>
+                    <div id="recentSchedules" class="recent-schedules-container"></div>
                 </div>
+
+                <!-- 오른쪽: 입력 폼 -->
+                <div class="form-section">
+                    <form th:action="${isEdit ? '/schedules/' + scheduleId : '/schedules'}" 
+                          th:object="${schedule}" 
+                          method="post">
+                        
+                        <!-- 팀 이름 -->
+                        <div class="form-group">
+                            <label for="teamName">팀 이름 <span class="required">*</span></label>
+                            <input type="text" 
+                                   id="teamName" 
+                                   th:field="*{teamName}" 
+                                   class="form-control"
+                                   placeholder="예: 밴드1"
+                                   required>
+                            <div class="error" th:if="${#fields.hasErrors('teamName')}" 
+                                 th:errors="*{teamName}"></div>
+                        </div>
+
+                        <!-- 팀원 구성 -->
+                        <div class="form-group">
+                            <label for="teamMembers">팀원 구성</label>
+                            <input type="text" 
+                                   id="teamMembers" 
+                                   th:field="*{teamMembers}" 
+                                   class="form-control"
+                                   placeholder="예: 홍길동, 김철수, 이영희">
+                            <div class="error" th:if="${#fields.hasErrors('teamMembers')}" 
+                                 th:errors="*{teamMembers}"></div>
+                        </div>
 
                 <!-- 날짜 -->
                 <div class="form-group">
@@ -67,13 +89,15 @@
                          th:errors="*{endTime}"></div>
                 </div>
 
-                <!-- 버튼 -->
-                <div class="form-actions">
-                    <a th:href="@{/schedules}" class="btn btn-secondary">취소</a>
-                    <button type="submit" class="btn btn-primary" 
-                            th:text="${isEdit ? '수정' : '저장'}">저장</button>
+                        <!-- 버튼 -->
+                        <div class="form-actions">
+                            <a th:href="@{/schedules}" class="btn btn-secondary">취소</a>
+                            <button type="submit" class="btn btn-primary" 
+                                    th:text="${isEdit ? '수정' : '저장'}">저장</button>
+                        </div>
+                    </form>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
 </body>

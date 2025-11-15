@@ -373,6 +373,74 @@ header h1 {
     margin-bottom: 20px;
 }
 
+/* 폼 레이아웃 (왼쪽: 최근 일정, 오른쪽: 입력 폼) */
+.form-layout {
+    display: grid;
+    grid-template-columns: 350px 1fr;
+    gap: 30px;
+    align-items: start;
+}
+
+/* 최근 일정 섹션 */
+.recent-schedules-section h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.recent-schedules-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.schedule-block {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px;
+    padding: 15px 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 10px rgba(102, 126, 234, 0.3);
+    color: white;
+    text-align: center;
+}
+
+.schedule-block:hover {
+    transform: translateX(5px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.5);
+}
+
+.schedule-block.selected {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    box-shadow: 0 5px 15px rgba(245, 87, 108, 0.5);
+}
+
+.schedule-team {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.no-schedules-msg {
+    color: #999;
+    font-size: 14px;
+    font-style: italic;
+    padding: 30px 20px;
+    text-align: center;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+/* 폼 섹션 */
+.form-section {
+    background: #fafbfc;
+    padding: 25px;
+    border-radius: 12px;
+    border: 1px solid #e1e4e8;
+}
+
 /* 반응형 디자인 */
 @media (max-width: 768px) {
     .container {
@@ -399,5 +467,19 @@ header h1 {
 
     .timeline-row {
         grid-template-columns: 70px 1fr;
+    }
+
+    /* 모바일에서는 세로 배치 */
+    .form-layout {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .recent-schedules-section {
+        order: 2;
+    }
+
+    .form-section {
+        order: 1;
     }
 }
